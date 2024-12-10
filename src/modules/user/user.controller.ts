@@ -4,13 +4,19 @@ import responseHandler from "../../utils/responseHandler";
 import { userService } from "./user.service";
 import { userRegistrationValidation } from "./user.validator";
 import jwt from "jsonwebtoken";
-import bcypt from "bcrypt";
+import bcrypt from "bcrypt";
+import { Types } from "mongoose";
 
-export const generateAccessToken = (_id: String, email: String) => {
+export const generateAccessToken = (
+  _id: Types.ObjectId,
+  email: String,
+  role: String | undefined
+) => {
   return jwt.sign(
     {
       _id,
       email,
+      role,
     },
     process.env.ACCESS_TOKEN_SECRET as string,
     {
@@ -26,7 +32,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new errorHandler(400, "Input field is empty");
   }
 
-  const hashedPassword = await bcypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const userInfo = { name, email, image, password: hashedPassword };
 
@@ -40,9 +46,45 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const createUser = await userService.createUserInDb(validatedData);
 
-  const accessToken = createUser?.accessToken;
+  res
+    .status(200)
+    .json(
+      new responseHandler(
+        200,
+        true,
+        createUser,
+        "User registered successfully!"
+      )
+    );
+});
 
-  const options = {
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  const matchedUser = await userService.findUserInDb(email);
+
+  if (!matchedUser) {
+    throw new errorHandler(404, "User do not exist.");
+  }
+
+  const encryptedPassword = matchedUser?.password as string;
+  const isPasswordCorrect = await bcrypt.compare(password, encryptedPassword);
+
+  let accessToken;
+
+  if (isPasswordCorrect) {
+    accessToken = generateAccessToken(
+      matchedUser?._id,
+      matchedUser?.email,
+      matchedUser?.role
+    );
+  } else {
+    throw new errorHandler(401, "Password is incorrect.");
+  }
+
+  const loginUserInfo = await userService.findUserByIdInDb(matchedUser?._id);
+
+
+  const options: TOptions = {
     httpOnly: true,
     secure: true,
     sameSite: "None",
@@ -55,10 +97,26 @@ const registerUser = asyncHandler(async (req, res) => {
       new responseHandler(
         200,
         true,
-        createUser,
-        "User registered successfully!"
+        loginUserInfo,
+        "User logedin successfully!"
       )
     );
 });
 
-export const userController = { registerUser };
+const logOutUser = asyncHandler(async (req: any, res) => {
+  const userId = req.user._id;
+  await userService.logOutUserFromDb(userId);
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new responseHandler(200, true, {}, "User logged out successfully"));
+});
+
+export const userController = { registerUser, loginUser, logOutUser };

@@ -1,20 +1,27 @@
+import { Types } from "mongoose";
 import errorHandler from "../../utils/errorHandler";
-import { generateAccessToken } from "./user.controller";
 import { TRegisterUser } from "./user.interface";
 import User from "./user.model";
 
 const findUserInDb = async (payload: string) => {
-  const result = await User.findOne({ payload });
+  const result = await User.findOne({ email: payload });
+  console.log(payload);
+  return result;
+};
+
+const findUserByIdInDb = async (payload: Types.ObjectId) => {
+  const result = await User.findById({ _id: payload }).select(
+    "-password -accessToken"
+  );
   return result;
 };
 
 const createUserInDb = async (payload: TRegisterUser) => {
   const result = await User.create(payload);
   if (result) {
-    const token = generateAccessToken(result._id, result.email);
-    result.accessToken = token;
-    await result.save();
-    const userInfo = await User.findById(result._id).select("-password ");
+    const userInfo = await User.findById(result._id).select(
+      "-password -accessToken"
+    );
 
     return userInfo;
   } else {
@@ -22,4 +29,23 @@ const createUserInDb = async (payload: TRegisterUser) => {
   }
 };
 
-export const userService = { findUserInDb, createUserInDb };
+const logOutUserFromDb = async (paylaod: Types.ObjectId) => {
+  const result = User.findByIdAndUpdate(
+    paylaod,
+    {
+      $unset: {
+        accessToken: 1,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+  return result;
+};
+export const userService = {
+  findUserInDb,
+  createUserInDb,
+  findUserByIdInDb,
+  logOutUserFromDb,
+};
