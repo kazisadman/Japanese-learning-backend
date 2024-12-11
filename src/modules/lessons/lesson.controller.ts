@@ -50,10 +50,7 @@ const deleteLesson = asyncHandler(async (req, res) => {
   const result = await lessonService.deleteLessonInDb(_id);
 
   if (!result) {
-    throw new errorHandler(
-      500,
-      "Something went wrong while deleting lesson."
-    );
+    throw new errorHandler(500, "Something went wrong while deleting lesson.");
   }
 
   res
@@ -66,14 +63,20 @@ const deleteLesson = asyncHandler(async (req, res) => {
 const getAllLessons = asyncHandler(async (req, res) => {
   const { query } = req.query;
 
-  const result = await lessonService.getAllLessonsFromDb((query as string) || "");
+  const result = await lessonService.getAllLessonsFromDb(
+    (query as string) || ""
+  );
+
+  if (!result) {
+    throw new errorHandler(500, "Something went wrong while deleting lesson.");
+  }
+
   res
     .status(200)
     .json(
       new responseHandler(200, true, result, "Lessons Fetched Successfully")
     );
 });
-
 
 export const lessonController = {
   createLesson,

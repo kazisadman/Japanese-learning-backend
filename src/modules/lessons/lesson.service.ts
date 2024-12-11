@@ -1,8 +1,6 @@
-import { Types } from "mongoose";
-import errorHandler from "../../utils/errorHandler";
 import Lesson, { TLesson } from "./lesson.model";
 
-type TUpdateProduct = {
+type TUpdateLesson = {
   _id: string;
   data: Partial<TLesson>;
 };
@@ -12,7 +10,7 @@ const createLessonInDb = async (payload: TLesson) => {
   return result;
 };
 
-const updateLessonInDb = async ({ _id, data }: TUpdateProduct) => {
+const updateLessonInDb = async ({ _id, data }: TUpdateLesson) => {
   const result = await Lesson.findByIdAndUpdate(_id, data, { new: true });
   return result;
 };

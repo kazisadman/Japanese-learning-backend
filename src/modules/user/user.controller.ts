@@ -68,12 +68,10 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const encryptedPassword = matchedUser?.password as string;
   const isPasswordCorrect = await bcrypt.compare(password, encryptedPassword);
-  console.log(isPasswordCorrect);
 
   if (!isPasswordCorrect) {
     throw new errorHandler(401, "Password is incorrect.");
   }
-  console.log("yes");
   const accessToken = generateAccessToken(
     matchedUser?._id,
     matchedUser?.email,
@@ -117,4 +115,44 @@ const logOutUser = asyncHandler(async (req: any, res) => {
     .json(new responseHandler(200, true, {}, "User logged out successfully"));
 });
 
-export const userController = { registerUser, loginUser, logOutUser };
+const getAllUser = asyncHandler(async (req, res) => {
+  const result = await userService.getAllUserFromDb();
+
+  if (!result) {
+    throw new errorHandler(500, "Something went wrong while deleting lesson.");
+  }
+
+  res
+    .status(200)
+    .json(new responseHandler(200, true, result, "User Fetched Successfully"));
+});
+
+const updateRole = asyncHandler(async (req, res) => {
+  const { _id } = req.params;
+
+  const result = await userService.updateRoleInDb(_id);
+
+  if (!result) {
+    throw new errorHandler(
+      500,
+      "Something went wrong while updating user Role."
+    );
+  }
+
+  res
+    .status(200)
+    .json(
+      new responseHandler(200, true, result, "Role Updated Successfully")
+    );
+});
+
+
+
+
+export const userController = {
+  registerUser,
+  loginUser,
+  logOutUser,
+  getAllUser,
+  updateRole,
+};
