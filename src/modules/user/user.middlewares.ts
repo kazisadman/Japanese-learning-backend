@@ -1,3 +1,4 @@
+import { NextFunction, Request, Response } from "express";
 import asyncHandler from "../../utils/asyncHandler";
 import errorHandler from "../../utils/errorHandler";
 import User from "./user.model";
@@ -13,7 +14,7 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
       throw new errorHandler(401, "Unauthorized request");
     }
 
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string);
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
 
     const user = await User.findById(decodedToken?._id).select(
       "-password -refresh_token"
@@ -31,4 +32,14 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
   }
 });
 
-export { verifyJWT };
+const verifyRoleAccess = (allowedRole: string) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const roleInDb = (req as any).user?.role;
+    if (!(allowedRole === roleInDb)) {
+      throw new errorHandler(403, "Access denied.");
+    }
+    next();
+  };
+};
+
+export { verifyJWT, verifyRoleAccess };

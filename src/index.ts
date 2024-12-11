@@ -1,10 +1,11 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import "dotenv/config";
-import cookieparser from 'cookie-parser'
+import cookieparser from "cookie-parser";
 import connectDb from "./server";
 
-import userRouter from './modules/user/user.router'
+import userRouter from "./modules/user/user.router";
+import lessonRouter from "./modules/lessons/lesson.router";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -20,7 +21,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/v1", userRouter);
-
+app.use("/api/v1/lesson", lessonRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { Types } from "mongoose";
 
-export const generateAccessToken = (
+const generateAccessToken = (
   _id: Types.ObjectId,
   email: String,
   role: String | undefined
@@ -68,23 +68,21 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const encryptedPassword = matchedUser?.password as string;
   const isPasswordCorrect = await bcrypt.compare(password, encryptedPassword);
+  console.log(isPasswordCorrect);
 
-  let accessToken;
-
-  if (isPasswordCorrect) {
-    accessToken = generateAccessToken(
-      matchedUser?._id,
-      matchedUser?.email,
-      matchedUser?.role
-    );
-  } else {
+  if (!isPasswordCorrect) {
     throw new errorHandler(401, "Password is incorrect.");
   }
+  console.log("yes");
+  const accessToken = generateAccessToken(
+    matchedUser?._id,
+    matchedUser?.email,
+    matchedUser?.role
+  );
 
   const loginUserInfo = await userService.findUserByIdInDb(matchedUser?._id);
 
-
-  const options: TOptions = {
+  const options = {
     httpOnly: true,
     secure: true,
     sameSite: "None",
