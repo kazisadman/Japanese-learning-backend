@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import asyncHandler from "../../utils/asyncHandler";
 import errorHandler from "../../utils/errorHandler";
 import User from "./user.model";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 const verifyJWT = asyncHandler(async (req, _, next) => {
   try {

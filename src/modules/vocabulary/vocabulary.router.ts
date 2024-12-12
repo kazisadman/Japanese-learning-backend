@@ -6,25 +6,25 @@ const router = express.Router();
 router.post(
   "/",
   verifyJWT,
-  verifyRoleAccess("user"),
+  verifyRoleAccess("admin"),
   vocabularyController.createVocabulary
 );
 router.get(
   "/",
   verifyJWT,
-  verifyRoleAccess("user"),
+  verifyRoleAccess("admin"),
   vocabularyController.getAllVocabularys
 );
 router.delete(
   "/:_id",
   verifyJWT,
-  verifyRoleAccess("user"),
+  verifyRoleAccess("admin"),
   vocabularyController.deleteVocabulary
 );
 router.patch(
   "/:_id",
   verifyJWT,
-  verifyRoleAccess("user"),
+  verifyRoleAccess("admin"),
   vocabularyController.updateVocabulary
 );
 

@@ -19,7 +19,7 @@ const vocabularyShema = new Schema<TVocabulary>({
     trim: true,
   },
   lesson_no: {
-    type: String,
+    type: Number,
     required: true,
     trim: true,
   },

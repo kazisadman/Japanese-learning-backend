@@ -27,6 +27,7 @@ const generateAccessToken = (
 
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, image, password } = req.body;
+  console.log(image);
 
   if ([name, email, image, password].some((input) => input?.trim() === "")) {
     throw new errorHandler(400, "Input field is empty");
@@ -46,8 +47,21 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const createUser = await userService.createUserInDb(validatedData);
 
+  const accessToken = generateAccessToken(
+    createUser?._id,
+    createUser?.email,
+    createUser?.role
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  };
+
   res
     .status(200)
+    .cookie("accessToken", accessToken, options)
     .json(
       new responseHandler(
         200,
@@ -83,7 +97,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
-    sameSite: "None",
+    sameSite: "none",
   };
 
   res
@@ -99,8 +113,8 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
-const logOutUser = asyncHandler(async (req: any, res) => {
-  const userId = req.user._id;
+const logOutUser = asyncHandler(async (req, res) => {
+  const userId = (req as any).user._id;
   await userService.logOutUserFromDb(userId);
 
   const options = {
@@ -138,16 +152,32 @@ const updateRole = asyncHandler(async (req, res) => {
       "Something went wrong while updating user Role."
     );
   }
+  const accessToken = generateAccessToken(
+    result?._id,
+    result?.email,
+    result?.role
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  };
 
   res
     .status(200)
-    .json(
-      new responseHandler(200, true, result, "Role Updated Successfully")
-    );
+    .cookie("accessToken", accessToken, options)
+    .json(new responseHandler(200, true, result, "Role Updated Successfully"));
 });
 
-
-
+const checkAuth = asyncHandler(async (req, res) => {
+  const userInfo = (req as any).user;
+  res
+    .status(200)
+    .json(
+      new responseHandler(200, true, userInfo, "Role Updated Successfully")
+    );
+});
 
 export const userController = {
   registerUser,
@@ -155,4 +185,5 @@ export const userController = {
   logOutUser,
   getAllUser,
   updateRole,
+  checkAuth,
 };

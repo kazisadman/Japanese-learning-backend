@@ -78,9 +78,26 @@ const getAllLessons = asyncHandler(async (req, res) => {
     );
 });
 
+const getLessonsByNo = asyncHandler(async (req, res) => {
+  const { lessonNo } = req.params;
+
+  const result = await lessonService.getLessonsByNoFromDB(Number(lessonNo));
+
+  if (!result) {
+    throw new errorHandler(500, "Something went wrong while deleting lesson.");
+  }
+
+  res
+    .status(200)
+    .json(
+      new responseHandler(200, true, result, "Lessons Fetched Successfully")
+    );
+});
+
 export const lessonController = {
   createLesson,
   updateLesson,
   deleteLesson,
   getAllLessons,
+  getLessonsByNo,
 };

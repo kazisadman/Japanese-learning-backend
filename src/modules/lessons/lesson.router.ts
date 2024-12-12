@@ -6,7 +6,7 @@ const router = express.Router();
 router.post(
   "/",
   verifyJWT,
-  verifyRoleAccess("user"),
+  verifyRoleAccess("admin"),
   lessonController.createLesson
 );
 router.get(
@@ -15,16 +15,28 @@ router.get(
   verifyRoleAccess("user"),
   lessonController.getAllLessons
 );
+router.get(
+  "/admin/",
+  verifyJWT,
+  verifyRoleAccess("admin"),
+  lessonController.getAllLessons
+);
+router.get(
+  "/:lessonNo",
+  verifyJWT,
+  verifyRoleAccess("user"),
+  lessonController.getLessonsByNo
+);
 router.delete(
   "/:_id",
   verifyJWT,
-  verifyRoleAccess("user"),
+  verifyRoleAccess("admin"),
   lessonController.deleteLesson
 );
 router.patch(
   "/:_id",
   verifyJWT,
-  verifyRoleAccess("user"),
+  verifyRoleAccess("admin"),
   lessonController.updateLesson
 );
 

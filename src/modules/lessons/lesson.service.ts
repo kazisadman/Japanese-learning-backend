@@ -35,9 +35,45 @@ const getAllLessonsFromDb = async (queryTerm: string) => {
     ]);
     return data;
   } else {
-    const data = await Lesson.find();
+    const data = await Lesson.aggregate([
+      {
+        $lookup: {
+          from: "vocabularies",
+          localField: "number",
+          foreignField: "lesson_no",
+          as: "result",
+        },
+      },
+      {
+        $addFields: {
+          word_count: {
+            $size: "$result",
+          },
+        },
+      },
+    ]);
     return data;
   }
+};
+
+const getLessonsByNoFromDB = async (payload: number) => {
+  console.log(typeof payload)
+  const lesson = await Lesson.aggregate([
+    {
+      $match: {
+        number: payload,
+      },
+    },
+    {
+      $lookup: {
+        from: "vocabularies",
+        localField: "number",
+        foreignField: "lesson_no",
+        as: "words",
+      },
+    },
+  ]);
+  return lesson;
 };
 
 export const lessonService = {
@@ -45,4 +81,5 @@ export const lessonService = {
   updateLessonInDb,
   deleteLessonInDb,
   getAllLessonsFromDb,
+  getLessonsByNoFromDB,
 };

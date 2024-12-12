@@ -2,7 +2,7 @@ export type TVocabulary = {
   word: string;
   pronunciation: string;
   when_to_say: string;
-  lesson_no: string;
+  lesson_no: number;
   admin_email: string;
 };
 
