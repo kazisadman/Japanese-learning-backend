@@ -13,7 +13,7 @@ const port = process.env.PORT || 3000;
 
 app.use(
   cors({
-    origin: "https://japanese-learning-client.vercel.app/",
+    origin: "https://japanese-learning-client.vercel.app",
     credentials: true,
   })
 );
