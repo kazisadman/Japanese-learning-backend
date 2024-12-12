@@ -8,8 +8,8 @@ import bcrypt from "bcrypt";
 import { Types } from "mongoose";
 
 const generateAccessToken = (
-  _id: Types.ObjectId,
-  email: String,
+  _id: Types.ObjectId | undefined,
+  email: String | undefined,
   role: String | undefined
 ) => {
   return jwt.sign(
@@ -56,7 +56,6 @@ const registerUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
-    sameSite: "none",
   };
 
   res
@@ -97,7 +96,6 @@ const loginUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
-    sameSite: "none",
   };
 
   res
@@ -122,7 +120,7 @@ const logOutUser = asyncHandler(async (req, res) => {
     secure: true,
   };
 
-  return res
+  res
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
@@ -161,7 +159,6 @@ const updateRole = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
-    sameSite: "none",
   };
 
   res
