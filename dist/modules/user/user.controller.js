@@ -47,6 +47,7 @@ const registerUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0,
     const options = {
         httpOnly: true,
         secure: true,
+        sameSite: "none",
     };
     res
         .status(200)
@@ -69,6 +70,7 @@ const loginUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, vo
     const options = {
         httpOnly: true,
         secure: true,
+        sameSite: "none",
     };
     res
         .status(200)
@@ -81,6 +83,7 @@ const logOutUser = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
     const options = {
         httpOnly: true,
         secure: true,
+        sameSite: "none",
     };
     res
         .status(200)
@@ -107,6 +110,7 @@ const updateRole = (0, asyncHandler_1.default)((req, res) => __awaiter(void 0, v
     const options = {
         httpOnly: true,
         secure: true,
+        sameSite: "none",
     };
     res
         .status(200)

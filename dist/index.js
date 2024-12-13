@@ -14,7 +14,10 @@ const vocabulary_router_1 = __importDefault(require("./modules/vocabulary/vocabu
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 app.use((0, cors_1.default)({
-    origin: "http://localhost:5173",
+    origin: [
+        "http://localhost:5173",
+        "https://japanese-learning-client.vercel.app",
+    ],
     credentials: true,
 }));
 app.use(express_1.default.json());
